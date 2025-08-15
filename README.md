@@ -1,2 +1,137 @@
-# na3.html
-My personal portfolio website created using HTML, CSS, and JavaScript.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlipCart Demo</title>
+<style>
+  :root {
+    --bg:#0f1724; --card:#0b1220; --accent:#ff6a00; --muted:#94a3b8; --glass: rgba(255,255,255,0.03); --maxw:1100px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; min-height:100vh; background:linear-gradient(180deg,#061022 0%,var(--bg) 100%); color:#e6eef8; font-family:Inter, sans-serif; display:flex; justify-content:center; align-items:flex-start; padding:24px;}
+  .container{width:100%; max-width:var(--maxw);}
+  header{display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;}
+  .logo{display:flex; align-items:center; gap:12px;}
+  .mark{width:44px; height:44px; border-radius:8px; background:linear-gradient(135deg,var(--accent),#ff925a); display:flex; align-items:center; justify-content:center; font-weight:700;}
+  main{display:grid; grid-template-columns:1fr 360px; gap:20px;}
+  .products{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px;}
+  .card{background:linear-gradient(180deg,var(--card),#071124); border-radius:12px; padding:14px; border:1px solid rgba(255,255,255,0.03); box-shadow:0 6px 18px rgba(2,6,23,0.6); cursor:pointer;}
+  .product-img{width:100%; aspect-ratio:4/3; border-radius:10px; background:#0b1220; display:flex; align-items:center; justify-content:center; overflow:hidden;}
+  .product-img img{width:100%; height:100%; object-fit:cover;}
+  .title{font-weight:600; margin:8px 0 4px;}
+  .price{font-size:18px; font-weight:700;}
+  .muted{color:var(--muted); font-size:13px;}
+  .sale-badge{background:linear-gradient(90deg,#ff4d4d,#ff8a5b); padding:6px 8px; border-radius:8px; font-weight:700; font-size:12px;}
+  aside{position:relative;}
+  .detail{position:sticky; top:20px; background:var(--glass); padding:16px; border-radius:12px; border:1px solid rgba(255,255,255,0.03);}
+  .specs{display:flex; flex-direction:column; gap:8px; margin-bottom:12px;}
+  input, textarea{width:100%; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); background:transparent; color:inherit; margin-bottom:8px;}
+  button{background:linear-gradient(90deg,var(--accent),#ff925a); border:none; padding:10px 14px; border-radius:10px; font-weight:700; color:#02111b; cursor:pointer;}
+  button:active{transform:translateY(1px);}
+  @media (max-width:880px){main{grid-template-columns:1fr} aside{order:2} .detail{position:relative; top:auto;}}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="logo">
+      <div class="mark">FC</div>
+      <div>
+        <h1>FlipCart — Demo</h1>
+        <div class="muted">Simple product grid with contact & sale UI</div>
+      </div>
+    </div>
+    <div class="muted">Call / WhatsApp: <strong>+91 98765 43210</strong></div>
+  </header>
+
+  <main>
+    <section>
+      <div class="products" id="products"></div>
+    </section>
+
+    <aside>
+      <div class="detail">
+        <h2 id="detail-title">Select a product</h2>
+        <div class="specs">
+          <div class="muted">Price: <span id="detail-price">-</span></div>
+          <div class="muted">Availability: <span id="detail-availability">-</span></div>
+        </div>
+
+        <div class="contact">
+          <form id="buy-form">
+            <input id="name" type="text" placeholder="Full name" required>
+            <input id="mobile" type="tel" placeholder="+91 98765 43210" required>
+            <input id="email" type="email" placeholder="you@example.com" required>
+            <textarea id="address" rows="3" placeholder="Flat / Street / City / PIN" required></textarea>
+            <button type="submit">Place order</button>
+          </form>
+          <div id="form-msg" class="muted" style="margin-top:8px"></div>
+        </div>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<script>
+const products = [
+  {id:1,title:'Wireless Earbuds X100',price:1199,oldPrice:1999,photo:'https://picsum.photos/seed/earbuds/800/600',stock:12,sale:true},
+  {id:2,title:'Smartphone Nova 8',price:12999,oldPrice:15999,photo:'https://picsum.photos/seed/phone/800/600',stock:5,sale:false},
+  {id:3,title:'Portable Speaker Boom',price:2499,oldPrice:null,photo:'https://picsum.photos/seed/speaker/800/600',stock:0,sale:true},
+  {id:4,title:'Fitness Band Pro',price:1999,oldPrice:2499,photo:'https://picsum.photos/seed/band/800/600',stock:20,sale:false}
+];
+
+const productsEl = document.getElementById('products');
+const detailTitle = document.getElementById('detail-title');
+const detailPrice = document.getElementById('detail-price');
+const detailAvailability = document.getElementById('detail-availability');
+
+function money(x){return '₹'+x.toLocaleString('en-IN')}
+
+function render(){
+  productsEl.innerHTML='';
+  products.forEach(p=>{
+    const card=document.createElement('div'); card.className='card';
+    card.innerHTML=`
+      <div class="product-img"><img src="${p.photo}" alt="${p.title}"></div>
+      <div class="title">${p.title}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div class="price">${money(p.price)} ${p.oldPrice?'<span class="muted" style="text-decoration:line-through;margin-left:8px;font-weight:600">'+money(p.oldPrice)+'</span>':''}</div>
+          <div class="muted">${p.stock>0?p.stock+' in stock':'Out of stock'}</div>
+        </div>
+        <div>${p.sale?'<div class="sale-badge">SALE</div>':''}</div>
+      </div>
+    `;
+    card.addEventListener('click',()=>selectProduct(p.id));
+    productsEl.appendChild(card);
+  });
+}
+
+function selectProduct(id){
+  const p = products.find(x=>x.id===id);
+  detailTitle.textContent = p.title;
+  detailPrice.textContent = money(p.price)+(p.oldPrice?(' (was '+money(p.oldPrice)+')'):'');
+  detailAvailability.textContent = p.stock>0?('In stock — '+p.stock+' units'):'Out of stock';
+}
+
+document.getElementById('buy-form').addEventListener('submit',e=>{
+  e.preventDefault();
+  const name = e.target.name.value.trim();
+  const mobile = e.target.mobile.value.trim();
+  const email = e.target.email.value.trim();
+  const address = e.target.address.value.trim();
+  const msgEl = document.getElementById('form-msg');
+
+  if(!name||!mobile||!email||!address){msgEl.textContent='Please fill all fields.';return;}
+
+  msgEl.textContent = 'Order placed successfully! Seller will contact you at ' + mobile + '.';
+  e.target.reset();
+});
+
+// initial render
+render();
+selectProduct(products[0].id);
+</script>
+</body>
+</html>
